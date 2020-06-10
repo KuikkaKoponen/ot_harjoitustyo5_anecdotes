@@ -11,6 +11,21 @@ const AnecdoteList = () => {
     dispatch(createAnec(content)) 
     event.target.anec.value = ''
     console.log('create', content)
+
+    const notification = {
+      type: 'FLAG',
+      content: content
+    }
+    dispatch(notification)
+    
+    const setnull = {
+      type: 'SETNULL'
+    }
+    setTimeout(() => {
+      dispatch(setnull)
+    }, 3000)
+
+    // pari sekkaa ja mene nollaan
   }
 
   return (

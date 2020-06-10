@@ -11,12 +11,29 @@ const AnecdoteForm = () => {
   const vote = (anecdote) => {    
     dispatch(createVote(anecdote))
     console.log('vote', anecdote.id)
+
+    const notification = {
+      type: 'FLAG',
+      content: anecdote.content
+    }
+    dispatch(notification)
+    
+    const setnull = {
+      type: 'SETNULL'
+    }
+
+    setTimeout(() => {
+      dispatch(setnull)
+    }, 3000)
   }
 
+  const filter =  useSelector(state => state.filter) 
+  const filteredAnec = anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
+    
   return (
     <div>
     <h2>Anecdotes</h2>
-    {anecdotes.map(anecdote =>  
+    {filteredAnec.map(anecdote =>  
       <div key={anecdote.id}>
         <div>
           {anecdote.content}

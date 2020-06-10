@@ -2,9 +2,9 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 
 const Notification = () => {
-  const notification = useSelector(({anecdotes, notification }) => {
+  const notification = useSelector(({notification }) => {
     if ( notification !== '' ) {
-      return `Created new anecdote: ${notification}`
+      return `Created or liked anecdote: ${notification}`
     } else {
       return ''  
     }

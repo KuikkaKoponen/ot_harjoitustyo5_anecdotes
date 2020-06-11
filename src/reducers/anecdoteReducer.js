@@ -27,16 +27,12 @@ import anecdoteService from '../services/anecdotes'
 const reducer = (state = [], action) => {
   console.log('state now: ', state)
   console.log('action', action)
-
-  const compareVotes = (a, b) => {
-    return b.votes - a.votes
-  }
   
-  switch (action.type) {      
+  switch (action.type) {  
       case 'CREATE':
         return state.concat(action.data)
       case 'INIT_ANECDOTES':
-        return action.data.sort(compareVotes)
+        return action.data
       case 'VOTE':
         const id = action.data.id
         const anecToChange = state.find(n => n.id === id)
@@ -46,7 +42,7 @@ const reducer = (state = [], action) => {
         }
         return state.map(anec =>
           anec.id !== id ? anec : changedAnec 
-        ).sort(compareVotes)
+        )
     default: return state
   }
 

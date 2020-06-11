@@ -1,41 +1,63 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { createAnec } from '../reducers/anecdoteReducer' // tarkkana aaltosulkujen kanssa ellei oo export default
+//import { useSelector, useDispatch } from 'react-redux'
+import { createVote } from '../reducers/anecdoteReducer'
 import { setNotification } from '../reducers/notificationReducer'
+import { connect } from 'react-redux'
 
-// FORM JA LIST NIMET MENNYT RISTIIN
-const AnecdoteList = () => {
+const AnecdoteList = (props) => {
   
-  const dispatch = useDispatch()
+  //const dispatch = useDispatch()
+  // haetaan vain anecdootit storesta
+  //const anecdotes = useSelector(state => state.anecdotes)
+  //const filter =  useSelector(state => state.filter)  
+  //const filteredAnec = anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
   
-  const createNew = async (event) => {    
-    event.preventDefault()
-    const content = event.target.anec.value
-    event.target.anec.value = ''
-    console.log('create', content)
-
-    // kaikki lisäykseen liittyvä absrahoitu reducereihin
-    dispatch(createAnec(content))
-    dispatch(setNotification(`you created '${content}'`, 5))
-
-    /* vanha tapa, uusi on abstahoitu hyödyntäen redux thunkia
-    // lähettää enecdootin palvelimelle ja saa {contennt: ..., id:..., votes: 0} takaisin
-    const newAnec = await anecdoteService.createNew(content)
-    // tallennetaan storageen saatu anecdootti
-    dispatch(createAnec(newAnec))
-    */
-
+  // tässä käytetään nyt connectia, joka on vanhempi tapa kuin useDispatc ja useSelector
+  const filteredAnec = () => {
+    const filter =  props.filter
+    const anecdotes = props.anecdotes
+    const filteredAnec = anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
+    return filteredAnec.sort(compareVotes)
   }
 
+  const compareVotes = (a, b) => {
+    return b.votes - a.votes
+  }
+ 
   return (
     <div>
-      <h2>create new</h2>
-      <form onSubmit={createNew}>
-        <input name="anec" />
-        <button type="submit">create</button>
-      </form>
+    <h2>Anecdotes</h2>
+    {filteredAnec().map(anecdote =>  
+      <div key={anecdote.id}>
+        <div>
+          {anecdote.content}
+        </div>
+        <div>
+          has {anecdote.votes}
+          <button onClick={() => props.createVote(anecdote) & props.setNotification(`you voted '${anecdote.content}'`, 5)}>vote</button>
+        </div>
+      </div>
+    )}
     </div>
-  ) 
+  )
+  // käytetään ei-kontrolloitua lomaketta eli ei ole stateja inputtille ja changille kuten ennen tehty
+  
 }
 
-export default AnecdoteList
+// tämä hakee storesta tilat
+const mapStateToProps = (state) => {
+  return {
+    anecdotes: state.anecdotes,
+    filter: state.filter,
+  }
+}
+
+// tämä dispachaa oliot
+const mapDispatchToProps = {
+  createVote, setNotification
+}
+
+const ConnectedNotes = connect(mapStateToProps, mapDispatchToProps)(AnecdoteList)
+export default ConnectedNotes
+
+// export default AnecdoteList

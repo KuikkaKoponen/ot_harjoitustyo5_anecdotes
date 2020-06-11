@@ -11,23 +11,23 @@ const notificationReducer = (state = '', action) => {
   }
 }
 
-  // uusi tapa, kaikki hoituu täällä
-  export const setNotification = (content, time) => {
-    return async dispatch => {
-      dispatch({
-        type: 'FLAG',
-        data: content,
-      })
+// uusi tapa, kaikki hoituu täällä
+export const setNotification = (content, time) => {
+  return async dispatch => { 
+    
+    dispatch({
+      type: 'FLAG',
+      data: content,
+    })
 
-      const setnull = {
-        type: 'SETNULL'
-      }
-  
-      setTimeout(() => {
-        dispatch(setnull)
-      }, time*1000)
+    const setnull = {
+      type: 'SETNULL'
     }
 
+    setTimeout(() => {
+      dispatch(setnull)
+    }, time*1000)
   }
+}
 
 export default notificationReducer

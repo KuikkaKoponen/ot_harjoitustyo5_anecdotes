@@ -1,6 +1,6 @@
 
 // stateen voi siis tallentaa missä muodossa haluaa. 
-// Kutsuss/Actionissa pitää olla kutitenkin type = 'JOTAIN'. Sen jölkeen sisältö voi olla vaikka content tms.
+// Kutsuss/Actionissa pitää olla kutitenkin type = 'JOTAIN'. Sen jälkeen sisältö voi olla vaikka content tms.
 const filterReducer = (state = '', action) => {
   
   switch (action.type) {

@@ -1,3 +1,4 @@
+/*
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -16,60 +17,95 @@ const asObject = (anecdote) => {
     votes: 0
   }
 }
-
+// hienosti kopioi oikeaan muotoon. Ei kuitenkaan käytetä tätä
 const initialState = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
+*/
+
+import anecdoteService from '../services/anecdotes'
+
+const reducer = (state = [], action) => {
   console.log('state now: ', state)
   console.log('action', action)
-  
+
   const compareVotes = (a, b) => {
     return b.votes - a.votes
   }
   
-  switch (action.type) {
-    case 'VOTE':
-      const id = action.data.id
-      const anecToChange = state.find(n => n.id === id)
-      // luodaan sitten uusi olio, joka on muuten kopio muuttuvasta oliosta mutta kentän important arvo on muutettu päinvastaiseksi
-      const changedAnec = { 
-        ...anecToChange, 
-        votes: action.data.votes +1
-      }
-
-      return state.map(anec =>
-        anec.id !== id ? anec : changedAnec 
-      ).sort(compareVotes)
-
+  switch (action.type) {      
       case 'CREATE':
-        const newAnec = {...action.data, id: getId()}
-        return state.concat(newAnec)
+        return state.concat(action.data)
+      case 'INIT_ANECDOTES':
+        return action.data.sort(compareVotes)
+      case 'VOTE':
+        const id = action.data.id
+        const anecToChange = state.find(n => n.id === id)
+        const changedAnec = { 
+          ...anecToChange, 
+          votes: action.data.votes
+        }
+        return state.map(anec =>
+          anec.id !== id ? anec : changedAnec 
+        ).sort(compareVotes)
     default: return state
   }
-}
 
-  // vote nappia painamala tehdää tämä. TEE ACTION CREATOR
-  export const createVote = (anecdote) => {
-    const voted = {
-      type: 'VOTE',
-      data: anecdote
-    }    
-    console.log('vote', anecdote.id)
-    return voted
+} 
+  /* vanha tapa
+  // alustusta varten
+  export const initializeAnecdotes = (anecdotes) => {
+    return {
+      type: 'INIT_ANECDOTES',
+      data: anecdotes,
+    }
+  }
+  */
+
+  // uusi tapa, kaikki hoituu täällä
+  export const initializeAnecdotes = () => {
+    return async dispatch => {
+      const anecdotes = await anecdoteService.getAll()
+      dispatch({
+        type: 'INIT_ANECDOTES',
+        data: anecdotes,
+      })
+    }
+  }
+  
+  /* vanha tapa
+  // vote nappia painamala tehdää tämä
+  export const createAnec = (content) => {
+    const newAnec = {
+      type: 'CREATE',
+      data: content
+    }
+    return newAnec 
+    
+  }
+  */
+
+  // uusi tapa, kaikki hoituu täällä
+  export const createAnec = (content) => {
+    return async dispatch => {
+      const newAnec = await anecdoteService.createNew(content)
+      dispatch({
+        type: 'CREATE',
+        data: newAnec
+      })
+    }
   }
 
-    // vote nappia painamala tehdää tämä
-    export const createAnec = (content) => {
-      const newAnec = {
-        type: 'CREATE',
-        data: 
-          { content: content,
-          id: '',  // tämä muutetaan myöh.
-          votes: 0 }
-      }  
-      return newAnec 
-      
+  // vote napin action creator
+  // uusi tapa, kaikki hoituu täällä
+  export const createVote = (anecdote) => {
+    const voted = {...anecdote, votes: anecdote.votes +1} 
+    return async dispatch => {
+      const updated = await anecdoteService.update(voted.id, voted)
+      dispatch({
+        type: 'VOTE',
+        data: updated,
+      })
     }
-
+  }
 
 export default reducer

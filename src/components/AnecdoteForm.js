@@ -1,34 +1,21 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import  {createVote} from '../reducers/anecdoteReducer'
+import { setNotification } from '../reducers/notificationReducer'
 
-// FORM JA LIST MENNYT RISTIIN
+// FORM JA LIST NIMET MENNYT RISTIIN
 const AnecdoteForm = () => {
   // haetaan vain anecdootit storesta
   const anecdotes = useSelector(state => state.anecdotes)
+  const filter =  useSelector(state => state.filter)  
+  const filteredAnec = anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
+  
   const dispatch = useDispatch()
 
-  const vote = (anecdote) => {    
+  const vote = (anecdote) => {        
     dispatch(createVote(anecdote))
-    console.log('vote', anecdote.id)
-
-    const notification = {
-      type: 'FLAG',
-      content: anecdote.content
-    }
-    dispatch(notification)
-    
-    const setnull = {
-      type: 'SETNULL'
-    }
-
-    setTimeout(() => {
-      dispatch(setnull)
-    }, 3000)
+    dispatch(setNotification(`you voted '${anecdote.content}'`, 5))
   }
-
-  const filter =  useSelector(state => state.filter) 
-  const filteredAnec = anecdotes.filter(anecdote => anecdote.content.toLowerCase().includes(filter.toLowerCase()))
     
   return (
     <div>
